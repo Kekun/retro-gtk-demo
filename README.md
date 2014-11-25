@@ -1,30 +1,23 @@
-#RetroGtk/Retro
+# RetroGtk demo
 
-![RetroGtk/Retro](https://github.com/Kekun/retro-gobject/blob/master/screenshot.png?raw=true)
+![RetroGtk demo](https://github.com/Kekun/retro-gtk-demo/blob/master/screenshot.png?raw=true)
 
-## Retro
+This is a demo of RetroGtk.
 
-Retro is the GObject/GLib libretro wrapper for frontends.
-
-## RetroGtk
-
-RetroGtk is a toolkit empowering Retro to write awesome Gtk+ 3 based libretro frontends.
-
-## Compiling and installing
-
-### Compiling and installing retro-gobject
-
-`make retro`
-`make install-retro`
-
-### Compiling and installing retro-gtk
-
-It requires retro-gobject to be installed.
-`make retro-gtk`
-`make install-retro-gtk`
-
-### Compiling demo
+## Compiling
 
 It requires retro-gobject and retro-gtk to be installed.
-`make demo`
+
+`make`
+
+## Running
+
+It requires libretro-free to be installed.
+
+`out/demo`
+
+
+![Gamepad configuration dialog](https://github.com/Kekun/retro-gtk-demo/blob/master/screenshot-gamepad.png?raw=true)
+
+![Options](https://github.com/Kekun/retro-gtk-demo/blob/master/screenshot-options.png?raw=true)
 
