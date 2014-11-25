@@ -22,12 +22,11 @@ using RetroGtk;
 using Gtk;
 
 public class Window : Gtk.Window {
-	private HashTable<string, Array<string>> module_for_ext;
+	private CoreFactory factory;
 
 	private enum UiState {
 		EMPTY,
-		HAS_CORE,
-		HAS_GAME
+		GAME_LOADED
 	}
 
 	private Gtk.HeaderBar header;
@@ -46,25 +45,12 @@ public class Window : Gtk.Window {
 
 	private KeyboardGamepadAdapter gamepad;
 
-	private Engine engine;
+	private OptionsHandler options;
 	private Runner runner;
 	private bool running { set; get; default = false; }
 
 	public Window (string[] modules) {
-		module_for_ext = new HashTable<string, Array<string>> (str_hash, str_equal);
-
-		foreach (var module in modules) {
-			var info = Retro.get_system_info (module);
-			if (info == null) continue;
-
-			var exts = info.valid_extensions.split ("|");
-			foreach (var ext in exts) {
-				if (module_for_ext[ext] == null) module_for_ext[ext] = new Array<string> ();
-				module_for_ext[ext].append_val (module);
-			}
-		}
-
-		engine = null;
+		factory = CoreFactory.instance;
 
 		header = new Gtk.HeaderBar ();
 		kb_box = new KeyboardBox ();
@@ -127,16 +113,12 @@ public class Window : Gtk.Window {
 		});
 	}
 
-	void set_titles () {
-		header.set_title (engine.info.library_name);
-	}
-
 	void on_open_game_button_clicked (Gtk.Button button) {
 		var dialog = new Gtk.FileChooserDialog ("Open core", this, Gtk.FileChooserAction.OPEN, "_Cancel", ResponseType.CANCEL, "_Open", ResponseType.ACCEPT);
 
 		var filter = new FileFilter ();
 		filter.set_filter_name ("Valid games");
-		foreach (var ext in module_for_ext.get_keys ()) {
+		foreach (var ext in factory.get_valid_extensions ()) {
 			filter.add_pattern ("*." + ext);
 		}
 		dialog.add_filter (filter);
@@ -170,60 +152,58 @@ public class Window : Gtk.Window {
 	void on_properties_button_clicked (Gtk.Button button) {
 		if (grid != null) popover.remove (grid);
 
-		grid = new OptionsGrid (engine.options);
+		grid = new OptionsGrid (options);
 		grid.show_all ();
 
 		popover.add (grid);
 	}
 
-	private void set_engine (string path) {
+	private void set_game (string path) {
+		var core = factory.core_for_game (path);
+		if (core == null) return;
+
 		if (runner != null) {
 			runner.stop ();
 			runner = null;
 		}
 
-		engine = new Engine(path);
-		game_screen.core = engine.core;
-		engine.video_handler = game_screen;
+		// Video
+		game_screen.core = core;
+		core.video_handler = game_screen;
 
-		engine.controller_handler.set_controller_device (0, gamepad);
+		// Audio
+		core.audio_handler = new AudioDevice ();
 
-		runner = new Runner (engine);
+		// Input
+		var controller_handler = new ControllerHandler ();
+		controller_handler.core = core;
+		core.input_handler = controller_handler;
+		controller_handler.set_controller_device (0, gamepad);
+
+		// Options
+		options = new OptionsHandler ();
+		options.value_changed.connect (() => {
+			core.variable_update = true;
+		});
+		core.get_variable.connect ((key) => { return options[key]; });
+		core.set_variables.connect ((variables) => {
+			options.insert_multiple (variables);
+			return true;
+		});
+
+		// Log
+		core.log_interface = new FileStreamLogger ();
+
+		core.init ();
+
+		runner = new Runner (core);
+
 		open_game_button.show ();
-		set_titles ();
-
-		set_ui_state (UiState.HAS_CORE);
-	}
-
-	private void set_game (string path) {
-		var split = path.split(".");
-		var ext = split[split.length -1];
-
-		if (! module_for_ext.contains (ext)) return;
-
-		var loaded = false;
-		var modules = module_for_ext[ext];
-		// Using foreach on modules.data display warnings
-		for (uint i = 0 ; i < modules.length ; i ++) {
-			var module = modules.index (i);
-			set_engine (module);
-			try {
-				loaded = engine.load_game (engine.info.need_fullpath ? GameInfo (path) : GameInfo.with_data (path));
-			}
-			catch (GLib.FileError e) {
-				stderr.printf ("Error: %s\n", e.message);
-			}
-
-			stdout.printf ("module %s loaded %s\n", module, loaded.to_string ());
-
-			if (loaded) break;
-		}
-
-		if (!loaded) return; // TODO warn
+		header.set_title (core.system_info.library_name);
 
 		header.set_subtitle (File.new_for_path (path).get_basename ());
 
-		set_ui_state (UiState.HAS_GAME);
+		set_ui_state (UiState.GAME_LOADED);
 
 		start_button.clicked ();
 	}
@@ -235,12 +215,7 @@ public class Window : Gtk.Window {
 				stop_button.hide ();
 				properties_button.hide ();
 				break;
-			case UiState.HAS_CORE:
-				start_button.hide ();
-				stop_button.hide ();
-				properties_button.hide ();
-				break;
-			case UiState.HAS_GAME:
+			case UiState.GAME_LOADED:
 				start_button.show ();
 				stop_button.show ();
 				properties_button.show ();

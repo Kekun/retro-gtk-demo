@@ -13,8 +13,8 @@ DEMO = $(OUT_DIR)/demo
 CONFIG_FILE=$(SRC_DIR)/config.vala
 
 FILES= \
+	CoreFactory.vala \
 	Demo.vala \
-	Engine.vala \
 	Window.vala \
 	OptionsGrid.vala \
 	$(NULL)
