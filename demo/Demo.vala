@@ -19,37 +19,19 @@
 using Retro;
 using Gtk;
 
-class Demo : Object {
-	private Window window;
-
-	public void run () {
-		Gtk.Settings.get_default().set("gtk-application-prefer-dark-theme", true);
-
-		window = new Window (get_libretro_modules ());
-		window.show ();
-		window.destroy.connect (() => { Gtk.main_quit(); } );
+class Demo : Gtk.Application {
+	construct {
+		application_id = "org.retro-gtk.demo";
+		flags = ApplicationFlags.FLAGS_NONE;
 	}
 
-	private string[] get_libretro_modules () {
-		string[] modules = {};
+	public override void activate () {
+		Gtk.Settings.get_default().set("gtk-application-prefer-dark-theme", true);
 
-		try {
-			var dirpath = @"$PREFIX/lib/libretro";
-			var directory = File.new_for_path (dirpath);
-			var enumerator = directory.enumerate_children (FileAttribute.STANDARD_NAME, 0);
-
-			FileInfo file_info;
-			while ((file_info = enumerator.next_file ()) != null) {
-				var name = file_info.get_name ();
-				if (/libretro-.+\.so/.match (name))
-					modules += @"$dirpath/$name";
-			}
-
-		} catch (Error e) {
-			stderr.printf ("Error: %s\n", e.message);
-		}
-
-		return modules;
+		var window = new Window ();
+		window.show ();
+//		window.destroy.connect (() => { Gtk.main_quit(); } );
+		add_window (window);
 	}
 
 	public static int main (string[] argv) {
@@ -61,11 +43,7 @@ class Demo : Object {
 		}
 
 		var d = new Demo ();
-		d.run ();
-
-		Gtk.main ();
-
-		return 0;
+		return d.run (argv);
 }
 
 }

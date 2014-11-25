@@ -21,7 +21,7 @@ using RetroGtk;
 
 using Gtk;
 
-public class Window : Gtk.Window {
+public class Window : Gtk.ApplicationWindow {
 	private CoreFactory factory;
 
 	private enum UiState {
@@ -49,7 +49,7 @@ public class Window : Gtk.Window {
 	private Runner runner;
 	private bool running { set; get; default = false; }
 
-	public Window (string[] modules) {
+	construct {
 		factory = CoreFactory.instance;
 
 		header = new Gtk.HeaderBar ();
