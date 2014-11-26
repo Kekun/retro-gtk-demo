@@ -20,12 +20,13 @@ using Retro;
 public class CoreFactory : Object {
 	private HashTable<string, Array<string>> module_for_ext;
 
-	private static CoreFactory _instance;
-	public static CoreFactory instance {
-		get { return _instance ?? (_instance = new CoreFactory ()); }
-	}
+	public VideoHandler video_handler { get; construct set; }
+	public AudioHandler audio_handler { get; construct set; }
+	public InputHandler input_handler { get; construct set; }
+	public VariablesHandler variables_handler { get; construct set; }
+	public Retro.Log log_interface { get; construct set; }
 
-	private CoreFactory () {
+	public CoreFactory () {
 		module_for_ext = new HashTable<string, Array<string>> (str_hash, str_equal);
 
 		try {
@@ -73,6 +74,15 @@ public class CoreFactory : Object {
 		for (uint i = 0 ; i < modules.length ; i ++) {
 			var module = modules.index (i);
 			var core = new Core (module);
+
+			core.variables_handler = variables_handler;
+			core.log_interface = log_interface;
+
+			core.init ();
+
+			core.video_handler = video_handler;
+			core.audio_handler = audio_handler;
+			core.input_handler = input_handler;
 
 			try {
 				var fullpath = core.system_info.need_fullpath;

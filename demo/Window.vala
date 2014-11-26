@@ -45,12 +45,11 @@ public class Window : Gtk.ApplicationWindow {
 	private KeyboardGamepadAdapter gamepad;
 
 	private OptionsHandler options;
+	private ControllerHandler controller_handler;
 	private Runner runner;
 	private bool running { set; get; default = false; }
 
 	construct {
-		factory = CoreFactory.instance;
-
 		header = new Gtk.HeaderBar ();
 		kb_box = new KeyboardBox ();
 		game_screen = new Display ();
@@ -110,6 +109,18 @@ public class Window : Gtk.ApplicationWindow {
 			}
 			gamepad_dialog.close ();
 		});
+
+		options = new OptionsHandler ();
+		controller_handler = new ControllerHandler ();
+		controller_handler.set_controller_device (0, gamepad);
+
+		factory = new CoreFactory ();
+
+		factory.video_handler = game_screen;
+		factory.audio_handler = new AudioDevice ();
+		factory.input_handler = controller_handler;
+		factory.variables_handler = options;
+		factory.log_interface = new FileStreamLogger ();
 	}
 
 	void on_open_game_button_clicked (Gtk.Button button) {
@@ -165,35 +176,6 @@ public class Window : Gtk.ApplicationWindow {
 			runner.stop ();
 			runner = null;
 		}
-
-		// Video
-		game_screen.core = core;
-		core.video_handler = game_screen;
-
-		// Audio
-		core.audio_handler = new AudioDevice ();
-
-		// Input
-		var controller_handler = new ControllerHandler ();
-		controller_handler.core = core;
-		core.input_handler = controller_handler;
-		controller_handler.set_controller_device (0, gamepad);
-
-		// Options
-		options = new OptionsHandler ();
-		options.value_changed.connect (() => {
-			core.variable_update = true;
-		});
-		core.get_variable.connect ((key) => { return options[key]; });
-		core.set_variables.connect ((variables) => {
-			options.insert_multiple (variables);
-			return true;
-		});
-
-		// Log
-		core.log_interface = new FileStreamLogger ();
-
-		core.init ();
 
 		runner = new Runner (core);
 
