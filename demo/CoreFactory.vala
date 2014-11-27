@@ -75,6 +75,8 @@ public class CoreFactory : Object {
 			var module = modules.index (i);
 			var core = new Core (module);
 
+			init_handlers ();
+
 			core.variables_handler = variables_handler;
 			core.log_interface = log_interface;
 
@@ -95,6 +97,13 @@ public class CoreFactory : Object {
 		}
 
 		return null; // TODO warn
+	}
+
+	private void init_handlers () {
+		variables_handler.core = null;
+		video_handler.core = null;
+		audio_handler.core = null;
+		input_handler.core = null;
 	}
 }
 
