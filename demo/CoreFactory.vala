@@ -78,11 +78,11 @@ public class CoreFactory : Object {
 			core.variables_handler = variables_handler;
 			core.log_interface = log_interface;
 
-			core.init ();
-
 			core.video_handler = video_handler;
 			core.audio_handler = audio_handler;
 			core.input_handler = input_handler;
+
+			core.init ();
 
 			try {
 				var fullpath = core.system_info.need_fullpath;
