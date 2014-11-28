@@ -34,7 +34,6 @@ class Demo : Gtk.Application {
 	}
 
 	public static int main (string[] argv) {
-		Retro.EnvironmentCommand.SET_VARIABLES.to_string();
 		Gtk.init (ref argv);
 		var clutter_error = Clutter.init (ref argv);
 		if (clutter_error != Clutter.InitError.SUCCESS) {
