@@ -29,17 +29,11 @@ class Demo : Gtk.Application {
 
 		var window = new Window ();
 		window.show ();
-//		window.destroy.connect (() => { Gtk.main_quit(); } );
 		add_window (window);
 	}
 
 	public static int main (string[] argv) {
-		Gtk.init (ref argv);
-		var clutter_error = Clutter.init (ref argv);
-		if (clutter_error != Clutter.InitError.SUCCESS) {
-			stderr.printf ("Clutter init error: %s\n", clutter_error.to_string ());
-			return clutter_error;
-		}
+		RetroGtk.init (ref argv);
 
 		var d = new Demo ();
 		return d.run (argv);
