@@ -175,6 +175,7 @@ public class Window : Gtk.ApplicationWindow {
 		if (runner != null) {
 			runner.stop ();
 			runner = null;
+			running = false;
 		}
 
 		runner = new Runner (core);
