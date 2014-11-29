@@ -45,7 +45,7 @@ public class Window : Gtk.ApplicationWindow {
 	private KeyboardGamepadAdapter gamepad;
 
 	private OptionsHandler options;
-	private ControllerHandler controller_handler;
+	private ControllerHandler controller_interface;
 	private Runner runner;
 	private bool running { set; get; default = false; }
 
@@ -111,15 +111,15 @@ public class Window : Gtk.ApplicationWindow {
 		});
 
 		options = new OptionsHandler ();
-		controller_handler = new ControllerHandler ();
-		controller_handler.set_controller_device (0, gamepad);
+		controller_interface = new ControllerHandler ();
+		controller_interface.set_controller_device (0, gamepad);
 
 		factory = new CoreFactory ();
 
-		factory.video_handler = game_screen;
-		factory.audio_handler = new AudioDevice ();
-		factory.input_handler = controller_handler;
-		factory.variables_handler = options;
+		factory.video_interface = game_screen;
+		factory.audio_interface = new AudioDevice ();
+		factory.input_interface = controller_interface;
+		factory.variables_interface = options;
 		factory.log_interface = new FileStreamLogger ();
 	}
 

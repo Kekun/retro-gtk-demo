@@ -20,10 +20,10 @@ using Retro;
 public class CoreFactory : Object {
 	private HashTable<string, Array<string>> module_for_ext;
 
-	public VideoHandler video_handler { get; construct set; }
-	public AudioHandler audio_handler { get; construct set; }
-	public InputHandler input_handler { get; construct set; }
-	public VariablesHandler variables_handler { get; construct set; }
+	public VideoInterface video_interface { get; construct set; }
+	public AudioInterface audio_interface { get; construct set; }
+	public InputInterface input_interface { get; construct set; }
+	public VariablesInterface variables_interface { get; construct set; }
 	public Retro.Log log_interface { get; construct set; }
 
 	public CoreFactory () {
@@ -75,14 +75,14 @@ public class CoreFactory : Object {
 			var module = modules.index (i);
 			var core = new Core (module);
 
-			init_handlers ();
+			init_interfaces ();
 
-			core.variables_handler = variables_handler;
+			core.variables_interface = variables_interface;
 			core.log_interface = log_interface;
 
-			core.video_handler = video_handler;
-			core.audio_handler = audio_handler;
-			core.input_handler = input_handler;
+			core.video_interface = video_interface;
+			core.audio_interface = audio_interface;
+			core.input_interface = input_interface;
 
 			core.init ();
 
@@ -99,11 +99,11 @@ public class CoreFactory : Object {
 		return null; // TODO warn
 	}
 
-	private void init_handlers () {
-		variables_handler.core = null;
-		video_handler.core = null;
-		audio_handler.core = null;
-		input_handler.core = null;
+	private void init_interfaces () {
+		variables_interface.core = null;
+		video_interface.core = null;
+		audio_interface.core = null;
+		input_interface.core = null;
 	}
 }
 
