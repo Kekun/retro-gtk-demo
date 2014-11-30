@@ -42,7 +42,7 @@ public class Window : Gtk.ApplicationWindow {
 	private Gtk.Popover popover;
 	private Gtk.Widget grid;
 
-	private KeyboardGamepadAdapter gamepad;
+	private Gamepad gamepad;
 
 	private OptionsHandler options;
 	private ControllerHandler controller_interface;
@@ -95,14 +95,14 @@ public class Window : Gtk.ApplicationWindow {
 
 		properties_button.set_popover (popover);
 
-		gamepad = new KeyboardGamepadAdapter (kb_box);
+		gamepad = new Gamepad (kb_box);
 
 		var gamepad_button = new Button.from_icon_name ("applications-games-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
 		header.pack_end (gamepad_button);
 		gamepad_button.show ();
 
 		gamepad_button.clicked.connect (() => {
-			var gamepad_dialog = new KeyboardGamepadConfigurationDialog ();
+			var gamepad_dialog = new GamepadConfigurationDialog ();
 			gamepad_dialog.set_transient_for (this);
 			if (gamepad_dialog.run () == ResponseType.APPLY) {
 				gamepad.configuration = gamepad_dialog.configuration;
@@ -110,9 +110,12 @@ public class Window : Gtk.ApplicationWindow {
 			gamepad_dialog.close ();
 		});
 
+		var mouse = new Mouse (kb_box);
+
 		options = new OptionsHandler ();
 		controller_interface = new ControllerHandler ();
 		controller_interface.set_controller_device (0, gamepad);
+		controller_interface.set_controller_device (1, mouse);
 		controller_interface.set_keyboard (kb_box);
 
 		factory = new CoreFactory ();
