@@ -113,6 +113,7 @@ public class Window : Gtk.ApplicationWindow {
 		options = new OptionsHandler ();
 		controller_interface = new ControllerHandler ();
 		controller_interface.set_controller_device (0, gamepad);
+		controller_interface.set_keyboard (kb_box);
 
 		factory = new CoreFactory ();
 
