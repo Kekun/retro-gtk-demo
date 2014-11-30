@@ -20,10 +20,10 @@ using Retro;
 public class CoreFactory : Object {
 	private HashTable<string, Array<string>> module_for_ext;
 
-	public VideoInterface video_interface { get; construct set; }
-	public AudioInterface audio_interface { get; construct set; }
-	public InputInterface input_interface { get; construct set; }
-	public VariablesInterface variables_interface { get; construct set; }
+	public Video video_interface { get; construct set; }
+	public Audio audio_interface { get; construct set; }
+	public Input input_interface { get; construct set; }
+	public Variables variables_interface { get; construct set; }
 	public Retro.Log log_interface { get; construct set; }
 
 	public CoreFactory () {
