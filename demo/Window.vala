@@ -29,7 +29,7 @@ public class Window : Gtk.ApplicationWindow {
 	}
 
 	private Gtk.HeaderBar header;
-	private KeyboardBox kb_box;
+	private EventBox kb_box;
 	private Display game_screen;
 
 	private Gtk.Image play_image;
@@ -51,7 +51,7 @@ public class Window : Gtk.ApplicationWindow {
 
 	construct {
 		header = new Gtk.HeaderBar ();
-		kb_box = new KeyboardBox ();
+		kb_box = new EventBox ();
 		game_screen = new Display ();
 		game_screen.set_size_request (640, 480);
 
