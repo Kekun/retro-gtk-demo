@@ -88,8 +88,24 @@ public class CoreFactory : Object {
 
 			try {
 				var fullpath = core.system_info.need_fullpath;
-				if (core.load_game (fullpath ? GameInfo (game_name) : GameInfo.with_data (game_name)))
+				if (core.load_game (fullpath ? GameInfo (game_name) : GameInfo.with_data (game_name))) {
+					core.unload_game ();
+					if (core.disk_control_interface != null) {
+						var disk = core.disk_control_interface;
+
+						disk.set_eject_state (true);
+
+						while (disk.get_num_images () < 1)
+							disk.add_image_index ();
+
+						var index = disk.get_num_images () - 1;
+
+						disk.replace_image_index (index, fullpath ? GameInfo (game_name) : GameInfo.with_data (game_name));
+
+						disk.set_eject_state (false);
+					}
 					return core;
+				}
 			}
 			catch (GLib.FileError e) {
 				stderr.printf ("Error: %s\n", e.message);
