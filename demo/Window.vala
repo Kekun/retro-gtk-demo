@@ -116,7 +116,7 @@ public class Window : Gtk.ApplicationWindow {
 		controller_interface = new ControllerHandler ();
 		controller_interface.set_controller_device (0, gamepad);
 		controller_interface.set_controller_device (1, mouse);
-		controller_interface.set_keyboard (kb_box);
+		controller_interface.set_keyboard (new Keyboard (kb_box));
 
 		factory = new CoreFactory ();
 
