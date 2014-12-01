@@ -185,9 +185,7 @@ public class Window : Gtk.ApplicationWindow {
 		runner = new Runner (core);
 
 		open_game_button.show ();
-		header.set_title (core.system_info.library_name);
-
-		header.set_subtitle (File.new_for_path (path).get_basename ());
+		header.set_title (File.new_for_path (path).get_basename ());
 
 		set_ui_state (UiState.GAME_LOADED);
 
@@ -200,6 +198,7 @@ public class Window : Gtk.ApplicationWindow {
 				start_button.hide ();
 				stop_button.hide ();
 				properties_button.hide ();
+				header.set_title ("RetroGtk Demo");
 				break;
 			case UiState.GAME_LOADED:
 				start_button.show ();
