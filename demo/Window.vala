@@ -111,6 +111,7 @@ public class Window : Gtk.ApplicationWindow {
 		});
 
 		var mouse = new Mouse (kb_box);
+		mouse.notify["parse"].connect (() => header.set_subtitle (mouse.parse ? "Press Crtl+Esc to ungrab" : null));
 
 		options = new OptionsHandler ();
 		controller_interface = new ControllerHandler ();
