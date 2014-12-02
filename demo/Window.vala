@@ -46,13 +46,13 @@ public class Window : Gtk.ApplicationWindow {
 
 	private OptionsHandler options;
 	private ControllerHandler controller_interface;
-	private Runner runner;
+	private Loop loop;
 	private bool running { set; get; default = false; }
 
 	construct {
 		header = new Gtk.HeaderBar ();
 		kb_box = new EventBox ();
-		game_screen = new Display ();
+		game_screen = new CairoDisplay ();
 		game_screen.set_size_request (640, 480);
 
 		open_game_button = new Gtk.Button.from_icon_name ("document-open-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
@@ -147,21 +147,21 @@ public class Window : Gtk.ApplicationWindow {
 
 	void on_start_button_clicked (Gtk.Button button) {
 		if (running) {
-			runner.stop ();
+			loop.stop ();
 			running = false;
 			start_button.set_image (play_image);
-			game_screen.hide_texture ();
+			game_screen.hide_video ();
 		}
 		else {
-			runner.start ();
+			loop.start ();
 			running = true;
 			start_button.set_image (pause_image);
-			game_screen.show_texture ();
+			game_screen.show_video ();
 		}
 	}
 
 	void on_stop_button_clicked (Gtk.Button button) {
-		runner.reset ();
+		loop.reset ();
 	}
 
 	void on_properties_button_clicked (Gtk.Button button) {
@@ -177,13 +177,13 @@ public class Window : Gtk.ApplicationWindow {
 		var core = factory.core_for_game (path);
 		if (core == null) return;
 
-		if (runner != null) {
-			runner.stop ();
-			runner = null;
+		if (loop != null) {
+			loop.stop ();
+			loop = null;
 			running = false;
 		}
 
-		runner = new Runner (core);
+		loop = new RetroGtk.ThreadedLoop (core);
 
 		open_game_button.show ();
 		header.set_title (File.new_for_path (path).get_basename ());
