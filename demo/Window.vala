@@ -125,7 +125,7 @@ public class Window : Gtk.ApplicationWindow {
 		factory.audio_interface = new AudioDevice ();
 		factory.input_interface = controller_interface;
 		factory.variables_interface = options;
-		factory.log_interface = new FileStreamLogger ();
+		factory.log_interface = new FileStreamLog ();
 	}
 
 	void on_open_game_button_clicked (Gtk.Button button) {
