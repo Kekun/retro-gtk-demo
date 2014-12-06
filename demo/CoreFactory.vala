@@ -73,7 +73,7 @@ public class CoreFactory : Object {
 
 		for (uint i = 0 ; i < modules.length ; i ++) {
 			var module = modules.index (i);
-			var core = new Core (module, true);
+			var core = new Core (module);
 
 			init_interfaces ();
 
