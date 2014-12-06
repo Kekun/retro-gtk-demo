@@ -44,7 +44,7 @@ public class Window : Gtk.ApplicationWindow {
 
 	private Gamepad gamepad;
 
-	private OptionsHandler options;
+	private Options options;
 	private ControllerHandler controller_interface;
 	private Loop loop;
 	private bool running { set; get; default = false; }
@@ -113,7 +113,7 @@ public class Window : Gtk.ApplicationWindow {
 		var mouse = new Mouse (kb_box);
 		mouse.notify["parse"].connect (() => header.set_subtitle (mouse.parse ? "Press Crtl+Esc to ungrab" : null));
 
-		options = new OptionsHandler ();
+		options = new Options ();
 		controller_interface = new ControllerHandler ();
 		controller_interface.set_controller_device (0, gamepad);
 		controller_interface.set_controller_device (1, mouse);

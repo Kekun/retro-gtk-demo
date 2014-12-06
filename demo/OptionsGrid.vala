@@ -16,12 +16,11 @@
  */
 
 using Retro;
-using RetroGtk;
 
 public class OptionsGrid : Gtk.Grid {
-	private OptionsHandler options;
+	private Options options;
 
-	public OptionsGrid (OptionsHandler options) {
+	public OptionsGrid (Options options) {
 		this.options = options;
 
 		margin_start = 12;
