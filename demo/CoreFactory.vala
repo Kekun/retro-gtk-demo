@@ -89,7 +89,6 @@ public class CoreFactory : Object {
 			try {
 				var fullpath = core.system_info.need_fullpath;
 				if (core.load_game (fullpath ? GameInfo (game_name) : GameInfo.with_data (game_name))) {
-					core.unload_game ();
 					if (core.disk_control_interface != null) {
 						var disk = core.disk_control_interface;
 
