@@ -109,6 +109,9 @@ public class CoreFactory : Object {
 			catch (GLib.FileError e) {
 				stderr.printf ("Error: %s\n", e.message);
 			}
+			catch (Retro.CbError e) {
+				stderr.printf ("Error: %s\n", e.message);
+			}
 		}
 
 		return null; // TODO warn
