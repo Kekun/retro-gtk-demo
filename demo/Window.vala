@@ -183,7 +183,7 @@ public class Window : Gtk.ApplicationWindow {
 			running = false;
 		}
 
-		loop = new RetroGtk.ThreadedLoop (core);
+		loop = new ThreadedLoop (core);
 
 		open_game_button.show ();
 		header.set_title (File.new_for_path (path).get_basename ());
