@@ -42,6 +42,7 @@ public class Window : Gtk.ApplicationWindow {
 	private Gtk.Popover popover;
 	private Gtk.Widget grid;
 
+	private VirtualGamepad virtual_gamepad;
 	private Gamepad gamepad;
 
 	private Options options;
@@ -95,7 +96,12 @@ public class Window : Gtk.ApplicationWindow {
 
 		properties_button.set_popover (popover);
 
-		gamepad = new Gamepad (kb_box);
+		var monitor = new Jsk.JoystickMonitor ("/dev/input");
+		var joysticks = monitor.get_joysticks ();
+		if (joysticks.length > 0)
+			gamepad = new Gamepad (new Jsk.Gamepad (joysticks[0]));
+
+		virtual_gamepad = new VirtualGamepad (kb_box);
 
 		var gamepad_button = new Button.from_icon_name ("applications-games-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
 		header.pack_end (gamepad_button);
@@ -105,7 +111,7 @@ public class Window : Gtk.ApplicationWindow {
 			var gamepad_dialog = new GamepadConfigurationDialog ();
 			gamepad_dialog.set_transient_for (this);
 			if (gamepad_dialog.run () == ResponseType.APPLY) {
-				gamepad.configuration = gamepad_dialog.configuration;
+				virtual_gamepad.configuration = gamepad_dialog.configuration;
 			}
 			gamepad_dialog.close ();
 		});
@@ -115,7 +121,10 @@ public class Window : Gtk.ApplicationWindow {
 
 		options = new Options ();
 		controller_interface = new ControllerHandler ();
-		controller_interface.set_controller_device (0, gamepad);
+		if (gamepad != null)
+			controller_interface.set_controller_device (0, gamepad);
+		else
+			controller_interface.set_controller_device (0, virtual_gamepad);
 		controller_interface.set_controller_device (1, mouse);
 		controller_interface.set_keyboard (new Keyboard (kb_box));
 

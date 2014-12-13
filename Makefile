@@ -21,7 +21,7 @@ FILES= \
 
 PKG= \
 	retro-gobject-0.2 \
-	retro-gtk-1.0 \
+	retro-gtk-0.1 \
 	$(NULL)
 
 SRC = $(FILES:%=$(SRC_DIR)/%)
