@@ -46,7 +46,7 @@ public class Window : Gtk.ApplicationWindow {
 	private Gamepad gamepad;
 
 	private Options options;
-	private ControllerHandler controller_interface;
+	private RetroGtk.InputDeviceManager controller_interface;
 	private Loop loop;
 	private bool running { set; get; default = false; }
 
@@ -120,7 +120,7 @@ public class Window : Gtk.ApplicationWindow {
 		mouse.notify["parse"].connect (() => header.set_subtitle (mouse.parse ? "Press Crtl+Esc to ungrab" : null));
 
 		options = new Options ();
-		controller_interface = new InputDeviceManager ();
+		controller_interface = new RetroGtk.InputDeviceManager ();
 		if (gamepad != null)
 			controller_interface.set_controller_device (0, gamepad);
 		else
