@@ -31,12 +31,17 @@ private class DemoHeaderBar : HeaderBar {
 	public Button stop_button;
 
 	public Button gamepad_button;
+	public Button fullscreen_button;
 	public MenuButton properties_button;
 	public Popover popover;
 
 	public bool play { set; get; }
 	private Image play_image;
 	private Image pause_image;
+
+	public bool fullscreen { set; get; }
+	private Image fullscreen_image;
+	private Image restore_image;
 
 	public Widget grid;
 
@@ -46,15 +51,24 @@ private class DemoHeaderBar : HeaderBar {
 		stop_button = new Button.from_icon_name ("media-skip-backward-symbolic", IconSize.SMALL_TOOLBAR);
 
 		gamepad_button = new Button.from_icon_name ("applications-games-symbolic", IconSize.SMALL_TOOLBAR);
+		fullscreen_button = new Button ();
 		properties_button = new MenuButton ();
 		popover = new Popover (properties_button);
 
 		play_image = new Image.from_icon_name ("media-playback-start-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
 		pause_image = new Image.from_icon_name ("media-playback-pause-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
 
+		fullscreen_image = new Image.from_icon_name ("view-fullscreen-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+		restore_image = new Image.from_icon_name ("view-restore-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+
 		start_button.set_image (play ? pause_image : play_image);
 		notify["play"].connect (() => {
 			start_button.set_image (play ? pause_image : play_image);
+		});
+
+		fullscreen_button.set_image (fullscreen ? restore_image : fullscreen_image);
+		notify["play"].connect (() => {
+			fullscreen_button.set_image (fullscreen ? restore_image : fullscreen_image);
 		});
 
 		properties_button.set_popover (popover);
@@ -63,12 +77,14 @@ private class DemoHeaderBar : HeaderBar {
 		pack_start (start_button);
 		pack_start (stop_button);
 		pack_end (properties_button);
+		pack_end (fullscreen_button);
 		pack_end (gamepad_button);
 
 		open_game_button.show ();
 		start_button.show ();
 		stop_button.show ();
 		gamepad_button.show ();
+		fullscreen_button.show ();
 		properties_button.show ();
 
 		set_show_close_button (true);
@@ -141,6 +157,18 @@ public class Window : Gtk.ApplicationWindow {
 				virtual_gamepad.configuration = gamepad_dialog.configuration;
 			}
 			gamepad_dialog.close ();
+		});
+
+		header.fullscreen_button.clicked.connect (() => {
+			if (header.fullscreen) {
+				print ("unfullscreen\n");
+				unfullscreen ();
+			}
+			else {
+				print ("fullscreen\n");
+				fullscreen ();
+			}
+			header.fullscreen = !header.fullscreen;
 		});
 
 		var mouse = new Mouse (kb_box);
