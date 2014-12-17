@@ -131,7 +131,7 @@ public class Window : Gtk.ApplicationWindow {
 		factory = new CoreFactory ();
 
 		factory.video_interface = game_screen;
-		factory.audio_interface = new AudioDevice ();
+		factory.audio_interface = new PaPlayer ();
 		factory.input_interface = controller_interface;
 		factory.variables_interface = options;
 		factory.log_interface = new FileStreamLog ();
