@@ -20,27 +20,83 @@ using RetroGtk;
 
 using Gtk;
 
+private enum UiState {
+	EMPTY,
+	GAME_LOADED
+}
+
+private class DemoHeaderBar : HeaderBar {
+	public Button open_game_button;
+	public Button start_button;
+	public Button stop_button;
+
+	public Button gamepad_button;
+	public MenuButton properties_button;
+	public Popover popover;
+
+	public bool play { set; get; }
+	private Image play_image;
+	private Image pause_image;
+
+	public Widget grid;
+
+	construct {
+		open_game_button = new Button.from_icon_name ("document-open-symbolic", IconSize.SMALL_TOOLBAR);
+		start_button = new Button ();
+		stop_button = new Button.from_icon_name ("media-skip-backward-symbolic", IconSize.SMALL_TOOLBAR);
+
+		gamepad_button = new Button.from_icon_name ("applications-games-symbolic", IconSize.SMALL_TOOLBAR);
+		properties_button = new MenuButton ();
+		popover = new Popover (properties_button);
+
+		play_image = new Image.from_icon_name ("media-playback-start-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+		pause_image = new Image.from_icon_name ("media-playback-pause-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
+
+		start_button.set_image (play ? pause_image : play_image);
+		notify["play"].connect (() => {
+			start_button.set_image (play ? pause_image : play_image);
+		});
+
+		properties_button.set_popover (popover);
+
+		pack_start (open_game_button);
+		pack_start (start_button);
+		pack_start (stop_button);
+		pack_end (properties_button);
+		pack_end (gamepad_button);
+
+		open_game_button.show ();
+		start_button.show ();
+		stop_button.show ();
+		gamepad_button.show ();
+		properties_button.show ();
+
+		set_show_close_button (true);
+	}
+
+	public void set_ui_state (UiState ui_state) {
+		switch (ui_state) {
+			case UiState.EMPTY:
+				start_button.hide ();
+				stop_button.hide ();
+				properties_button.hide ();
+				set_title ("RetroGtk Demo");
+				break;
+			case UiState.GAME_LOADED:
+				start_button.show ();
+				stop_button.show ();
+				properties_button.show ();
+				break;
+		}
+	}
+}
+
 public class Window : Gtk.ApplicationWindow {
 	private CoreFactory factory;
 
-	private enum UiState {
-		EMPTY,
-		GAME_LOADED
-	}
-
-	private Gtk.HeaderBar header;
+	private DemoHeaderBar header;
 	private EventBox kb_box;
 	private Display game_screen;
-
-	private Gtk.Image play_image;
-	private Gtk.Image pause_image;
-
-	private Gtk.Button open_game_button;
-	private Gtk.Button start_button;
-	private Gtk.Button stop_button;
-	private Gtk.MenuButton properties_button;
-	private Gtk.Popover popover;
-	private Gtk.Widget grid;
 
 	private VirtualGamepad virtual_gamepad;
 	private Gamepad gamepad;
@@ -51,50 +107,25 @@ public class Window : Gtk.ApplicationWindow {
 	private bool running { set; get; default = false; }
 
 	construct {
-		header = new Gtk.HeaderBar ();
+		header = new DemoHeaderBar ();
 		kb_box = new EventBox ();
 		game_screen = new CairoDisplay ();
 		game_screen.set_size_request (640, 480);
-
-		open_game_button = new Gtk.Button.from_icon_name ("document-open-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-		start_button = new Gtk.Button ();
-		stop_button = new Gtk.Button.from_icon_name ("media-skip-backward-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-		properties_button = new Gtk.MenuButton ();
-		popover = new Gtk.Popover (properties_button);
 
 		set_titlebar (header);
 		add (kb_box);
 		kb_box.add (game_screen);
 
-		header.pack_start (open_game_button);
-		header.pack_start (start_button);
-		header.pack_start (stop_button);
-		header.pack_end (properties_button);
-
-		header.set_show_close_button (true);
-
-		open_game_button.clicked.connect (on_open_game_button_clicked);
-		start_button.clicked.connect (on_start_button_clicked);
-		stop_button.clicked.connect (on_stop_button_clicked);
-		properties_button.clicked.connect (on_properties_button_clicked);
+		header.open_game_button.clicked.connect (on_open_game_button_clicked);
+		header.start_button.clicked.connect (on_start_button_clicked);
+		header.stop_button.clicked.connect (on_stop_button_clicked);
+		header.properties_button.clicked.connect (on_properties_button_clicked);
 
 		header.show ();
 		kb_box.show ();
 		game_screen.show ();
 
-		open_game_button.show ();
-		start_button.show ();
-		stop_button.show ();
-		properties_button.show ();
-
-		set_ui_state (UiState.EMPTY);
-
-		play_image = new Image.from_icon_name ("media-playback-start-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-		pause_image = new Image.from_icon_name ("media-playback-pause-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-
-		start_button.set_image (running ? pause_image : play_image);
-
-		properties_button.set_popover (popover);
+		header.set_ui_state (UiState.EMPTY);
 
 		var monitor = new Jsk.JoystickMonitor ("/dev/input");
 		var joysticks = monitor.get_joysticks ();
@@ -103,11 +134,7 @@ public class Window : Gtk.ApplicationWindow {
 
 		virtual_gamepad = new VirtualGamepad (kb_box);
 
-		var gamepad_button = new Button.from_icon_name ("applications-games-symbolic", Gtk.IconSize.SMALL_TOOLBAR);
-		header.pack_end (gamepad_button);
-		gamepad_button.show ();
-
-		gamepad_button.clicked.connect (() => {
+		header.gamepad_button.clicked.connect (() => {
 			var gamepad_dialog = new GamepadConfigurationDialog ();
 			gamepad_dialog.set_transient_for (this);
 			if (gamepad_dialog.run () == ResponseType.APPLY) {
@@ -158,15 +185,14 @@ public class Window : Gtk.ApplicationWindow {
 		if (running) {
 			loop.stop ();
 			running = false;
-			start_button.set_image (play_image);
 			game_screen.hide_video ();
 		}
 		else {
 			loop.start ();
 			running = true;
-			start_button.set_image (pause_image);
 			game_screen.show_video ();
 		}
+		header.play = running;
 	}
 
 	void on_stop_button_clicked (Gtk.Button button) {
@@ -174,12 +200,12 @@ public class Window : Gtk.ApplicationWindow {
 	}
 
 	void on_properties_button_clicked (Gtk.Button button) {
-		if (grid != null) popover.remove (grid);
+		if (header.grid != null) header.popover.remove (header.grid);
 
-		grid = new OptionsGrid (options);
-		grid.show_all ();
+		header.grid = new OptionsGrid (options);
+		header.grid.show_all ();
 
-		popover.add (grid);
+		header.popover.add (header.grid);
 	}
 
 	private void set_game (string path) {
@@ -194,28 +220,12 @@ public class Window : Gtk.ApplicationWindow {
 
 		loop = new ThreadedLoop (core);
 
-		open_game_button.show ();
+		header.open_game_button.show ();
 		header.set_title (File.new_for_path (path).get_basename ());
 
-		set_ui_state (UiState.GAME_LOADED);
+		header.set_ui_state (UiState.GAME_LOADED);
 
-		start_button.clicked ();
-	}
-
-	private void set_ui_state (UiState ui_state) {
-		switch (ui_state) {
-			case UiState.EMPTY:
-				start_button.hide ();
-				stop_button.hide ();
-				properties_button.hide ();
-				header.set_title ("RetroGtk Demo");
-				break;
-			case UiState.GAME_LOADED:
-				start_button.show ();
-				stop_button.show ();
-				properties_button.show ();
-				break;
-		}
+		header.start_button.clicked ();
 	}
 }
 
