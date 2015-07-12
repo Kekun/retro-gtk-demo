@@ -33,7 +33,7 @@ class Demo : Gtk.Application {
 	}
 
 	public static int main (string[] argv) {
-		RetroGtk.init (ref argv);
+		Gtk.init (ref argv);
 
 		var d = new Demo ();
 		return d.run (argv);
