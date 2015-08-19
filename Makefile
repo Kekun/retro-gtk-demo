@@ -19,7 +19,7 @@ FILES= \
 	$(NULL)
 
 PKG= \
-	retro-gobject-0.2 \
+	retro-gobject-0.3 \
 	retro-gtk-0.1 \
 	$(NULL)
 
