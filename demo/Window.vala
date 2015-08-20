@@ -137,6 +137,14 @@ public class Window : Gtk.ApplicationWindow {
 		factory.log_interface = new FileStreamLog ();
 	}
 
+	~Window () {
+		if (loop != null) {
+			loop.stop ();
+			loop = null;
+			running = false;
+		}
+	}
+
 	void on_open_game_button_clicked (Gtk.Button button) {
 		var dialog = new Gtk.FileChooserDialog ("Open core", this, Gtk.FileChooserAction.OPEN, "_Cancel", ResponseType.CANCEL, "_Open", ResponseType.ACCEPT);
 
